@@ -2,6 +2,7 @@
 
 /**
  * Helper functions
+ * v1.2 - with mqtt enhancements
 */
 
 
@@ -124,9 +125,9 @@ class Val {
 	}
 
 	public static function topic($value) {
-		if (preg_match('/[^A-z0-9\-_\/\+]/',$value))
+		if (preg_match('/[^A-z0-9, \-_\/\+]/',$value))
 			return false;
-		return preg_replace('/[^A-z0-9\-_\/\+]/','',$value);
+		return preg_replace('/[^A-z0-9, \-_\/\+]/','',$value);
 	}
 	
 	public static function is_base64_encoded($data) {
