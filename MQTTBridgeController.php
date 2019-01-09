@@ -42,8 +42,10 @@ class MQTTBridgeController {
 		
 				//do not care for value - could be empty, why not?
 				$value = urldecode(Get::string('value'));
-				if (!$value) $value = '';
-	
+				if (!$value) {
+                                        if (Get::set('valuets')) $value = gmdate('Y-m-d H:i:s e');
+                                        else $value = '';
+                                }	
 				$this->publish($topic,$value,$retain,$user,$pass);
 				$this->view->render();
 		}
