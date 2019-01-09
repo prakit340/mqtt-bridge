@@ -1,7 +1,6 @@
 <?php
 require_once 'lib/request.php';
 require_once 'lib/phpMQTT.php';
-require_once 'view/PublishView.php';
 
 use techdada\phpMQTT;
 
@@ -16,9 +15,12 @@ class MQTTBridgeController {
 				echo 'not implemented';
 				break;
 			case 'publish':
-			default:
+				require_once 'view/PublishView.php';
+
 				$this->view = new PublishView();
 				$this->view->setTitle('Publish');
+
+				// get important parameters
 				if (!$topic = Get::topic('topic')) {
 					$this->view->setError('no topic');
 				}
@@ -34,18 +36,35 @@ class MQTTBridgeController {
 						}
 					}
 				}
-
+				// get optional parameters
 				$retain = 0;
 				if (Get::boolean('retain')) {
 					$retain = 1;
-				} 
+				}
+				$allow_spaces = 0;
+				if (Get::set('allow_spaces')) {
+					$allow_spaces = 1;
+				}
+				if (!$allow_spaces) {
+                                        //      spaces in topic names are replaced
+                                        //      by _ if not explicitely allowed
+                                        $topic = preg_replace('/\s/','_',$topic);
+                                }
 		
 				//do not care for value - could be empty, why not?
 				$value = urldecode(Get::string('value'));
-				if (!$value) $value = '';
+				if (!$value) {
+					if (Get::set('valuets')) $value = gmdate('Y-m-d H:i:s e');
+					else $value = '';
+				}
 	
 				$this->publish($topic,$value,$retain,$user,$pass);
 				$this->view->render();
+				break;
+			default:
+				require_once 'view/IndexView.php';
+
+				$this->view = new IndexView();
 		}
 	}
 
